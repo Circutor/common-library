@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Circutor S.A. All rights reserved.
 
-module https://github.com/Circutor/common-library
+module github.com/Circutor/common-library
 
 go 1.15
 
