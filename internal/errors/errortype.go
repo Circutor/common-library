@@ -18,3 +18,13 @@ func WrapErrFound(err error, format string, args ...interface{}) error {
 func NewErrFound(format string, args ...interface{}) error {
 	return &errFound{errors.Errorf(format, args...)}
 }
+
+// ErrMessage struct content message error.
+type ErrMessage struct {
+	Message string `json:"message"`
+}
+
+// NewErrMessage create a error message.
+func NewErrMessage(message string) ErrMessage {
+	return ErrMessage{Message: message}
+}
