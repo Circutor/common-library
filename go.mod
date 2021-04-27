@@ -1,7 +1,11 @@
 // Copyright (c) 2021 Circutor S.A. All rights reserved.
 
-module github.com/Circutor/common-library
+module github.com/circutor/common-library
 
 go 1.15
 
-require github.com/pkg/errors v0.9.1
+require (
+	github.com/jbrodriguez/mlog v0.0.0-20180805173533-cbd5ae8e9c53
+	github.com/pkg/errors v0.9.1
+	golang.org/x/net v0.0.0-20210423184538-5f58ad60dda6
+)
