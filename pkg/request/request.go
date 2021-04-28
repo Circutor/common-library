@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/circutor/common-library/internal/request/config"
+	"github.com/circutor/common-library/pkg/request/config"
 	"github.com/jbrodriguez/mlog"
 )
 
