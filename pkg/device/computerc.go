@@ -71,7 +71,7 @@ func (d ComputerC) SetAttrClient(c CommonService, microservice string) (int, map
 		return http.StatusInternalServerError, dataError, errors.WrapErrFound(err, microservice)
 	}
 
-	status, message, err := c.thingsBoard.DeviceAPI.PostDeviceAttributes("", attrVertical)
+	status, message, err := c.thingsBoard.DeviceAPI.PostDeviceAttributes(c.accessToken, attrVertical)
 	if err != nil {
 		return http.StatusInternalServerError, message, errors.WrapErrFound(err, microservice)
 	}
