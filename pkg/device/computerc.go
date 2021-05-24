@@ -64,7 +64,7 @@ func (d ComputerC) SetAttrClient(c CommonService, microservice string) (int, map
 		return status, message, errors.WrapErrFound(err, microservice)
 	}
 
-	attrVertical, err := data.ResponseDecode(NewComputerC(0, 0, 0, false))
+	attrVertical, err := data.ResponseDecode(NewComputerC(d.TargetCosPhi, d.Power, d.Voltage, d.RejectionFilters))
 	if err != nil {
 		dataError, _ := data.ResponseDecode(errors.NewErrMessage(err.Error()))
 

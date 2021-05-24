@@ -32,7 +32,8 @@ func NewAttrTransversal(name, description, company, zone, typology, use string) 
 
 // SetAttrTransversal add in shared scope attributes from traversal type.
 func (d AttrTransversal) SetAttrTransversal(c CommonService, microservice string) (int, map[string]interface{}, error) {
-	attrTransversal, err := data.ResponseDecode(NewAttrTransversal("", "", "", "", "", ""))
+	attrTransversal, err := data.ResponseDecode(NewAttrTransversal(
+		d.Name, d.Description, d.Company, d.Zone, d.Typology, d.Use))
 	if err != nil {
 		dataError, _ := data.ResponseDecode(errors.NewErrMessage(err.Error()))
 
