@@ -40,8 +40,8 @@ func (d AttrTransversal) SetAttrTransversal(c CommonService, microservice string
 		return http.StatusInternalServerError, dataError, errors.WrapErrFound(err, microservice)
 	}
 
-	status, messageErr, err := c.thingsBoard.Telemetry.SaveDeviceAttributes(
-		c.deviceID, "SHARED_SCOPE", c.adminToken, attrTransversal)
+	status, messageErr, err := c.ThingsBoard.Telemetry.SaveDeviceAttributes(
+		c.DeviceID, "SHARED_SCOPE", c.AdminToken, attrTransversal)
 	if err != nil {
 		message, _ := data.ResponseDecode(errors.NewErrMessage(fmt.Sprintf("%v", messageErr[0])))
 
@@ -53,7 +53,7 @@ func (d AttrTransversal) SetAttrTransversal(c CommonService, microservice string
 
 // DeleteDevice delete device from user.
 func (d AttrTransversal) DeleteDevice(c CommonService, microservice string) (int, map[string]interface{}, error) {
-	status, message, err := c.thingsBoard.Device.ReClaimDevice(c.deviceName, c.userToken)
+	status, message, err := c.ThingsBoard.Device.ReClaimDevice(c.DeviceName, c.UserToken)
 	if err != nil {
 		return status, message, errors.WrapErrFound(err, microservice)
 	}

@@ -33,14 +33,31 @@ func (d ComputerC) SetAttrServer(c CommonService, microservice string) (int, map
 	attrBody := map[string]interface{}{
 		"claimingAllowed": true,
 		"claimingData": map[string]interface{}{
-			"secretKey":      c.secretKey,
-			"expirationTime": c.expirationTime,
+			"secretKey":      c.SecretKey,
+			"expirationTime": c.ExpirationTime,
 		},
-		"userMaster": c.userID,
+		"userMaster": c.UserID,
 	}
 
-	status, messageErr, err := c.thingsBoard.Telemetry.SaveDeviceAttributes(
-		c.deviceID, "SERVER_SCOPE", c.adminToken, attrBody)
+	status, messageErr, err := c.ThingsBoard.Telemetry.SaveDeviceAttributes(
+		c.DeviceID, "SERVER_SCOPE", c.AdminToken, attrBody)
+	if err != nil {
+		message, _ := data.ResponseDecode(errors.NewErrMessage(fmt.Sprintf("%v", messageErr[0])))
+
+		return status, message, errors.WrapErrFound(err, microservice)
+	}
+
+	return status, nil, nil
+}
+
+// SetAttrServerClient add in shared scope attributes.
+func (d ComputerC) SetAttrServerClient(c CommonService, microservice string) (int, map[string]interface{}, error) {
+	attributesBody := map[string]interface{}{
+		"typology": "Electricity",
+	}
+
+	status, messageErr, err := c.ThingsBoard.Telemetry.SaveDeviceAttributes(
+		c.DeviceID, "SHARED_SCOPE", c.AdminToken, attributesBody)
 	if err != nil {
 		message, _ := data.ResponseDecode(errors.NewErrMessage(fmt.Sprintf("%v", messageErr[0])))
 
@@ -52,18 +69,6 @@ func (d ComputerC) SetAttrServer(c CommonService, microservice string) (int, map
 
 // SetAttrClient add in client scope attributes.
 func (d ComputerC) SetAttrClient(c CommonService, microservice string) (int, map[string]interface{}, error) {
-	attributesBody := map[string]interface{}{
-		"typology": "Electricity",
-	}
-
-	status, messageErr, err := c.thingsBoard.Telemetry.SaveDeviceAttributes(
-		c.deviceID, "SHARED_SCOPE", c.adminToken, attributesBody)
-	if err != nil {
-		message, _ := data.ResponseDecode(errors.NewErrMessage(fmt.Sprintf("%v", messageErr[0])))
-
-		return status, message, errors.WrapErrFound(err, microservice)
-	}
-
 	attrVertical, err := data.ResponseDecode(NewComputerC(d.TargetCosPhi, d.Power, d.Voltage, d.RejectionFilters))
 	if err != nil {
 		dataError, _ := data.ResponseDecode(errors.NewErrMessage(err.Error()))
@@ -71,7 +76,7 @@ func (d ComputerC) SetAttrClient(c CommonService, microservice string) (int, map
 		return http.StatusInternalServerError, dataError, errors.WrapErrFound(err, microservice)
 	}
 
-	status, message, err := c.thingsBoard.DeviceAPI.PostDeviceAttributes(c.accessToken, attrVertical)
+	status, message, err := c.ThingsBoard.DeviceAPI.PostDeviceAttributes(c.AccessToken, attrVertical)
 	if err != nil {
 		return http.StatusInternalServerError, message, errors.WrapErrFound(err, microservice)
 	}

@@ -6,30 +6,30 @@ import "github.com/circutor/thingsboard-methods/pkg/controller"
 
 // CommonService fields to make calls to thingsBoard.
 type CommonService struct {
-	thingsBoard    controller.ThingsBoardController
-	deviceID       string
-	deviceName     string
-	accessToken    string
-	userID         string
-	userToken      string
-	adminToken     string
-	secretKey      string
-	expirationTime int
+	ThingsBoard    controller.ThingsBoardController
+	DeviceID       string
+	DeviceName     string
+	AccessToken    string
+	UserID         string
+	UserToken      string
+	AdminToken     string
+	SecretKey      string
+	ExpirationTime int
 }
 
 // NewCommonService creates a new CommonService.
 func NewCommonService(tb controller.ThingsBoardController, deviceID, deviceName, accessToken, userID, userToken,
 	adminToken, secretKey string, expirationTime int) CommonService {
 	return CommonService{
-		thingsBoard:    tb,
-		deviceID:       deviceID,
-		deviceName:     deviceName,
-		accessToken:    accessToken,
-		userID:         userID,
-		userToken:      userToken,
-		adminToken:     adminToken,
-		secretKey:      secretKey,
-		expirationTime: expirationTime,
+		ThingsBoard:    tb,
+		DeviceID:       deviceID,
+		DeviceName:     deviceName,
+		AccessToken:    accessToken,
+		UserID:         userID,
+		UserToken:      userToken,
+		AdminToken:     adminToken,
+		SecretKey:      secretKey,
+		ExpirationTime: expirationTime,
 	}
 }
 
@@ -37,6 +37,7 @@ func NewCommonService(tb controller.ThingsBoardController, deviceID, deviceName,
 type VerticalDevice interface {
 	SetAttrServer(c CommonService, microservice string) (int, map[string]interface{}, error)
 	SetAttrClient(c CommonService, microservice string) (int, map[string]interface{}, error)
+	SetAttrServerClient(c CommonService, microservice string) (int, map[string]interface{}, error)
 }
 
 // TransversalDevice Operations device transversal.
