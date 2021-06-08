@@ -5,7 +5,7 @@ module github.com/circutor/common-library
 go 1.15
 
 require (
-	github.com/circutor/thingsboard-methods v0.0.0-20210518112537-4c505ead6b87 // indirect
+	github.com/circutor/thingsboard-methods v0.0.0-20210602074742-2201a90d07ad
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.6.1
