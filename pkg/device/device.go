@@ -40,8 +40,12 @@ type VerticalDevice interface {
 	SetAttrServerClient(c CommonService, microservice string) (int, map[string]interface{}, error)
 }
 
+//go:generate mockery --name VerticalDevice --structname VerticalDeviceMock --filename VerticalDeviceMock.go
+
 // TransversalDevice Operations device transversal.
 type TransversalDevice interface {
 	SetAttrTransversal(c CommonService, microservice string) (int, map[string]interface{}, error)
 	DeleteDevice(c CommonService, microservice string) (int, map[string]interface{}, error)
 }
+
+//go:generate mockery --name TransversalDevice --structname TransversalDeviceMock --filename TransversalDeviceMock.go
