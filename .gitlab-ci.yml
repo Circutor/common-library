@@ -13,7 +13,7 @@ before_script:
 stages:
   - build
   - lint
-  - deploy
+  - test
 
 build:
   stage: build
@@ -28,3 +28,9 @@ lint:
     - golangci-lint version
     - golangci-lint linters
     - golangci-lint run
+
+test:
+  stage: test
+  script:
+    - echo "Testing"
+    - make test
