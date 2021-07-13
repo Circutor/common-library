@@ -4,53 +4,32 @@ package data
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
+	"net/http"
 )
 
 const (
 	// Constants error.
 	errEncodeRequestBody  = "error in encode request body"
 	errDecodeResponseBody = "error in decode response body"
+	// Constants to use with the content type.
+	contentType     = "Content-type"
+	contentTypeJSON = "application/json"
 )
 
-// BodyEncode method encode request body payload.
-func BodyEncode(v interface{}) (*bytes.Buffer, error) {
-	reqBody := new(bytes.Buffer)
-
-	err := json.NewEncoder(reqBody).Encode(v)
-	if err != nil {
-		return nil, fmt.Errorf("%s : %w", errEncodeRequestBody, err)
-	}
-
-	return reqBody, nil
+type InterfaceData interface {
+	BodyEncode(v interface{}) (*bytes.Buffer, error)
+	BodyDecodeToMap(contentBody []byte) (map[string]interface{}, error)
+	BodyDecodeToArray(contentBody []byte) ([]interface{}, error)
+	ResponseDecodeToMap(v interface{}) (map[string]interface{}, error)
+	ResponseDecodeToArray(v interface{}) ([]interface{}, error)
+	SendJSON(w http.ResponseWriter, v interface{})
 }
 
-// BodyDecode method decode body of the response object.
-func BodyDecode(contentBody []byte) (map[string]interface{}, error) {
-	var body map[string]interface{}
+//go:generate mockery --name InterfaceData --structname InterfaceDataMock --filename InterfaceDataMock.go
 
-	err := json.Unmarshal(contentBody, &body)
-	if err != nil {
-		return nil, fmt.Errorf("%s : %w", errDecodeResponseBody, err)
-	}
+type Data struct{}
 
-	return body, nil
-}
-
-// ResponseDecode method transforms struct to map[string]interface{}.
-func ResponseDecode(v interface{}) (map[string]interface{}, error) {
-	respBodyByte, err := json.Marshal(v)
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	var respBody map[string]interface{}
-
-	err = json.NewDecoder(bytes.NewReader(respBodyByte)).Decode(&respBody)
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
-	return respBody, nil
+// NewData creates a new InterfaceData.
+func NewData() Data {
+	return Data{}
 }
