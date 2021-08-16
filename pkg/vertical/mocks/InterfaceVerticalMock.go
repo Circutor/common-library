@@ -74,6 +74,36 @@ func (_m *InterfaceVerticalMock) SetAttrServer(deviceID string, costumerID strin
 	return r0, r1, r2
 }
 
+// TelemetryInitialization provides a mock function with given fields: accessToken, deviceType, msg, tb
+func (_m *InterfaceVerticalMock) TelemetryInitialization(accessToken string, deviceType string, msg string, tb controller.ThingsBoardController) (int, map[string]interface{}, error) {
+	ret := _m.Called(accessToken, deviceType, msg, tb)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(string, string, string, controller.ThingsBoardController) int); ok {
+		r0 = rf(accessToken, deviceType, msg, tb)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 map[string]interface{}
+	if rf, ok := ret.Get(1).(func(string, string, string, controller.ThingsBoardController) map[string]interface{}); ok {
+		r1 = rf(accessToken, deviceType, msg, tb)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(map[string]interface{})
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(string, string, string, controller.ThingsBoardController) error); ok {
+		r2 = rf(accessToken, deviceType, msg, tb)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // UpdateTypology provides a mock function with given fields: deviceID, token, msg, tb, _a4
 func (_m *InterfaceVerticalMock) UpdateTypology(deviceID string, token string, msg string, tb controller.ThingsBoardController, _a4 data.InterfaceData) (int, map[string]interface{}, error) {
 	ret := _m.Called(deviceID, token, msg, tb, _a4)

@@ -29,6 +29,8 @@ type InterfaceVertical interface {
 		data data.InterfaceData) (int, map[string]interface{}, error)
 	UpdateTypology(deviceID, token, msg string, tb controller.ThingsBoardController,
 		data data.InterfaceData) (int, map[string]interface{}, error)
+	TelemetryInitialization(accessToken, deviceType, msg string,
+		tb controller.ThingsBoardController) (int, map[string]interface{}, error)
 }
 
 //go:generate mockery --name InterfaceVertical --structname InterfaceVerticalMock --filename InterfaceVerticalMock.go
