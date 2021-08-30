@@ -187,7 +187,7 @@ func getAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]
 }
 
 func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
-	data data.InterfaceData, request request.Request) (int, map[string]interface{}, error) {
+	data data.InterfaceData, request request.InterfaceRequest) (int, map[string]interface{}, error) {
 	status, lastCommunication, err := getLastCommunication(deviceID, token, msg, data, request)
 	if err != nil {
 		return status, lastCommunication, errors.WrapErrFound(err, err.Error())
@@ -216,7 +216,7 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.Th
 
 // getLastCommunication: gets last communication of device.
 func getLastCommunication(deviceID, token, msg string,
-	d data.InterfaceData, r request.Request) (int, map[string]interface{}, error) {
+	d data.InterfaceData, r request.InterfaceRequest) (int, map[string]interface{}, error) {
 	urlLastCommunication := "http://computer-telemetry-service:60020/api/v1/computer-service/lastCommunication"
 
 	resBody, status, err := r.CreateNewRequest(
@@ -239,7 +239,7 @@ func getLastCommunication(deviceID, token, msg string,
 
 // getMaintenanceAlarms gets last alarms maintenance of device.
 func getMaintenanceAlarms(deviceID, token, msg string,
-	d data.InterfaceData, r request.Request) (int, []interface{}, error) {
+	d data.InterfaceData, r request.InterfaceRequest) (int, []interface{}, error) {
 	urlGetAlarms := "http://computer-telemetry-service:60020/api/v1/computer-service/alarms"
 
 	resBody, status, err := r.CreateNewRequest(

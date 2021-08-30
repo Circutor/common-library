@@ -33,7 +33,7 @@ type InterfaceVertical interface {
 	TelemetryInitialization(accessToken, deviceType, msg string,
 		tb controller.ThingsBoardController) (int, map[string]interface{}, error)
 	GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
-		data data.InterfaceData, request request.Request) (int, map[string]interface{}, error)
+		data data.InterfaceData, request request.InterfaceRequest) (int, map[string]interface{}, error)
 }
 
 //go:generate mockery --name InterfaceVertical --structname InterfaceVerticalMock --filename InterfaceVerticalMock.go

@@ -17,18 +17,18 @@ type InterfaceVerticalMock struct {
 }
 
 // GetDeviceAlarms provides a mock function with given fields: deviceID, token, msg, tb, _a4, _a5
-func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, msg string, tb controller.ThingsBoardController, _a4 data.InterfaceData, _a5 request.Request) (int, map[string]interface{}, error) {
+func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, msg string, tb controller.ThingsBoardController, _a4 data.InterfaceData, _a5 request.InterfaceRequest) (int, map[string]interface{}, error) {
 	ret := _m.Called(deviceID, token, msg, tb, _a4, _a5)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.Request) int); ok {
+	if rf, ok := ret.Get(0).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) int); ok {
 		r0 = rf(deviceID, token, msg, tb, _a4, _a5)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 map[string]interface{}
-	if rf, ok := ret.Get(1).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.Request) map[string]interface{}); ok {
+	if rf, ok := ret.Get(1).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) map[string]interface{}); ok {
 		r1 = rf(deviceID, token, msg, tb, _a4, _a5)
 	} else {
 		if ret.Get(1) != nil {
@@ -37,7 +37,7 @@ func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, 
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.Request) error); ok {
+	if rf, ok := ret.Get(2).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) error); ok {
 		r2 = rf(deviceID, token, msg, tb, _a4, _a5)
 	} else {
 		r2 = ret.Error(2)
