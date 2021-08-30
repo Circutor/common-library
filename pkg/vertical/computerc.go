@@ -240,7 +240,7 @@ func getLastCommunication(deviceID, token, msg string,
 // getMaintenanceAlarms gets last alarms maintenance of device.
 func getMaintenanceAlarms(deviceID, token, msg string,
 	d data.InterfaceData, r request.InterfaceRequest) (int, []interface{}, error) {
-	urlGetAlarms := "http://computer-telemetry-service:60020/api/v1/computer-service/alarms"
+	urlGetAlarms := "http://computer-telemetry-service:60020/api/v1/computer-service/maintenance"
 
 	resBody, status, err := r.CreateNewRequest(
 		http.MethodGet, urlGetAlarms, token, nil, map[string]interface{}{"deviceId": deviceID, "numberOfDays": 1})
