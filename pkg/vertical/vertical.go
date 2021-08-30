@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/circutor/common-library/pkg/data"
+	"github.com/circutor/common-library/pkg/request"
 	"github.com/circutor/thingsboard-methods/pkg/controller"
 	"github.com/sigurn/crc8"
 )
@@ -31,6 +32,8 @@ type InterfaceVertical interface {
 		data data.InterfaceData) (int, map[string]interface{}, error)
 	TelemetryInitialization(accessToken, deviceType, msg string,
 		tb controller.ThingsBoardController) (int, map[string]interface{}, error)
+	GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
+		data data.InterfaceData, request request.Request) (int, map[string]interface{}, error)
 }
 
 //go:generate mockery --name InterfaceVertical --structname InterfaceVerticalMock --filename InterfaceVerticalMock.go

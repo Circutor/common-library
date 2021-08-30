@@ -5,9 +5,12 @@ package vertical
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/circutor/common-library/pkg/data"
 	"github.com/circutor/common-library/pkg/errors"
+	"github.com/circutor/common-library/pkg/request"
+	"github.com/circutor/common-library/pkg/shared"
 	"github.com/circutor/common-library/pkg/translations"
 	"github.com/circutor/thingsboard-methods/pkg/controller"
 	"github.com/go-playground/validator/v10"
@@ -181,4 +184,200 @@ func getAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]
 	}
 
 	return nil, nil
+}
+
+func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
+	data data.InterfaceData, request request.Request) (int, map[string]interface{}, error) {
+	status, lastCommunication, err := getLastCommunication(deviceID, token, msg, data, request)
+	if err != nil {
+		return status, lastCommunication, errors.WrapErrFound(err, err.Error())
+	}
+
+	if status != http.StatusOK {
+		return status, lastCommunication, errors.NewErrFound("Error call getLastCommunication %s", msg)
+	}
+
+	status, alarms, err := getMaintenanceAlarms(deviceID, token, msg, data, request)
+	if err != nil {
+		return status, alarms[0].(map[string]interface{}), errors.WrapErrFound(err, err.Error())
+	}
+
+	if status != http.StatusOK {
+		return status, alarms[0].(map[string]interface{}), errors.NewErrFound("Error call getMaintenanceAlarms %s", msg)
+	}
+
+	status, timeSeries, target, err := getTimeSeriesAndAttributes(deviceID[:len(deviceID)-3], token, msg, tb)
+	if err != nil {
+		return status, timeSeries, errors.WrapErrFound(err, err.Error())
+	}
+
+	return status, createAlarms(lastCommunication, timeSeries, alarms, target), nil
+}
+
+// getLastCommunication: gets last communication of device.
+func getLastCommunication(deviceID, token, msg string,
+	d data.InterfaceData, r request.Request) (int, map[string]interface{}, error) {
+	urlLastCommunication := "http://computer-telemetry-service:60020/api/v1/computer-service/lastCommunication"
+
+	resBody, status, err := r.CreateNewRequest(
+		http.MethodGet, urlLastCommunication, token, nil, map[string]interface{}{"deviceId": deviceID})
+	if err != nil {
+		dataError, _ := d.ResponseDecodeToMap(errors.NewErrMessage(err.Error()))
+
+		return status, dataError, errors.WrapErrFound(err, msg)
+	}
+
+	responseBody, err := d.BodyDecodeToMap(resBody)
+	if err != nil {
+		dataError, _ := d.ResponseDecodeToMap(errors.NewErrMessage(err.Error()))
+
+		return http.StatusInternalServerError, dataError, errors.WrapErrFound(err, msg)
+	}
+
+	return status, responseBody, nil
+}
+
+// getMaintenanceAlarms gets last alarms maintenance of device.
+func getMaintenanceAlarms(deviceID, token, msg string,
+	d data.InterfaceData, r request.Request) (int, []interface{}, error) {
+	urlGetAlarms := "http://computer-telemetry-service:60020/api/v1/computer-service/alarms"
+
+	resBody, status, err := r.CreateNewRequest(
+		http.MethodGet, urlGetAlarms, token, nil, map[string]interface{}{"deviceId": deviceID, "numberOfDays": 1})
+	if err != nil {
+		dataError, _ := d.ResponseDecodeToArray(errors.NewErrMessage(err.Error()))
+
+		return status, dataError, errors.WrapErrFound(err, msg)
+	}
+
+	responseBody, err := d.BodyDecodeToArray(resBody)
+	if err != nil {
+		dataError, _ := d.ResponseDecodeToArray(errors.NewErrMessage(err.Error()))
+
+		return http.StatusInternalServerError, dataError, errors.WrapErrFound(err, msg)
+	}
+
+	return status, responseBody, nil
+}
+
+// getTimeSeriesAndAttributes gets device timeSeries and target cos phi.
+func getTimeSeriesAndAttributes(deviceID, token, msg string,
+	tb controller.ThingsBoardController) (int, map[string]interface{}, float64, error) {
+	keys := map[string]interface{}{
+		"keys": "cosPhiDaily,cosPhiDailyType,failTargetCosPhiAlarmDaily,failTargetCosPhiAlarmWeekly," +
+			"failTendencyAlarmDaily,failTendencyAlarmWeekly",
+	}
+
+	status, timeSeries, err := tb.Telemetry.GetLatestTimeseries("DEVICE", deviceID, token, keys)
+	if err != nil {
+		return status, timeSeries, 0, errors.WrapErrFound(err, msg)
+	}
+
+	status, credentials, err := tb.Device.GetDeviceCredentialsByDeviceID(deviceID, token)
+	if err != nil {
+		return status, credentials, 0, errors.WrapErrFound(err, msg)
+	}
+
+	status, attr, err := tb.DeviceAPI.GetDeviceAttributes(credentials["credentialsId"].(string), nil)
+	if err != nil {
+		return status, attr, 0, errors.WrapErrFound(err, msg)
+	}
+
+	return status, timeSeries, attr["client"].(map[string]interface{})["targetCosPhi"].(float64), nil
+}
+
+//nolint:funlen
+// createAlarms generates alarm object from device.
+func createAlarms(lastCommunication, timeSeries map[string]interface{},
+	maintenance []interface{}, target float64) map[string]interface{} {
+	var (
+		maintenanceStep      bool
+		maintenanceExcessive bool
+	)
+
+	if lastCommunication["date"] == "" {
+		return map[string]interface{}{
+			"communication": map[string]interface{}{
+				"communication": false,
+				"date":          "",
+			},
+			"maintenance": map[string]interface{}{
+				"maintenance": false,
+				"step":        false,
+				"excessive":   false,
+			},
+			"cosphi": map[string]interface{}{
+				"target": map[string]interface{}{
+					"current": false,
+					"daily":   false,
+					"weekly":  false,
+				},
+				"tendency": map[string]interface{}{
+					"daily":  false,
+					"weekly": false,
+				},
+			},
+		}
+	}
+
+	current := false
+
+	for _, step := range maintenance[0].(map[string]interface{})["POWLOSS_STEPS"].(map[string]interface{}) {
+		if step == true {
+			maintenanceStep = true
+
+			break
+		}
+	}
+
+	for _, excessive := range maintenance[0].(map[string]interface{})["REPCONN_STEPS"].(map[string]interface{}) {
+		if excessive == true {
+			maintenanceExcessive = true
+
+			break
+		}
+	}
+
+	cosPhiDailyType := timeSeries["cosPhiDailyType"].([]interface{})[0].(map[string]interface{})["value"].(string)
+	cosPhiDailyStr := timeSeries["cosPhiDaily"].([]interface{})[0].(map[string]interface{})["value"].(string)
+	cosPhiDaily, _ := strconv.ParseFloat(cosPhiDailyStr, 8)
+
+	if (cosPhiDaily < target) && cosPhiDailyType == "L" {
+		current = true
+	}
+
+	failTargetCosPhiAlarmDaily := shared.StrToBool(
+		timeSeries["failTargetCosPhiAlarmDaily"].([]interface{})[0].(map[string]interface{})["value"].(string))
+
+	failTargetCosPhiAlarmWeekly := shared.StrToBool(
+		timeSeries["failTargetCosPhiAlarmWeekly"].([]interface{})[0].(map[string]interface{})["value"].(string))
+
+	failTendencyAlarmDaily := shared.StrToBool(
+		timeSeries["failTendencyAlarmDaily"].([]interface{})[0].(map[string]interface{})["value"].(string))
+
+	failTendencyAlarmWeekly := shared.StrToBool(
+		timeSeries["failTendencyAlarmWeekly"].([]interface{})[0].(map[string]interface{})["value"].(string))
+
+	return map[string]interface{}{
+		"communication": map[string]interface{}{
+			"communication": lastCommunication["status"],
+			"date":          lastCommunication["date"],
+		},
+		"maintenance": map[string]interface{}{
+			"maintenance": maintenance[0].(map[string]interface{})["OPERATING_HOURS"].(map[string]interface{})["status"],
+			"step":        maintenanceStep,
+			"excessive":   maintenanceExcessive,
+		},
+		"cosphi": map[string]interface{}{
+			"target": map[string]interface{}{
+				"current": current,
+				"daily":   failTargetCosPhiAlarmDaily,
+				"weekly":  failTargetCosPhiAlarmWeekly,
+			},
+			"tendency": map[string]interface{}{
+				"daily":  failTendencyAlarmDaily,
+				"weekly": failTendencyAlarmWeekly,
+			},
+		},
+	}
 }
