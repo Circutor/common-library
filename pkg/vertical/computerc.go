@@ -5,7 +5,6 @@ package vertical
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/circutor/common-library/pkg/data"
 	"github.com/circutor/common-library/pkg/errors"
@@ -117,7 +116,7 @@ func (c ComputerC) TelemetryInitialization(accessToken, deviceType, msg string,
 	powloss, repconn := getAlarmsDeviceType(deviceType)
 
 	query := map[string]interface{}{
-		"alarmsDaily": map[string]interface{}{
+		"maintenance": map[string]interface{}{
 			"OPERATING_HOURS": map[string]interface{}{
 				"status": false,
 				"time":   "",
@@ -125,14 +124,12 @@ func (c ComputerC) TelemetryInitialization(accessToken, deviceType, msg string,
 			"POWLOSS_STEPS": powloss,
 			"REPCONN_STEPS": repconn,
 		},
-		"cosPhiDaily":                 0,
-		"cosPhiDailyType":             "",
-		"cosPhiWeekly":                0,
-		"cosPhiWeeklyType":            "",
-		"failTargetCosPhiAlarmDaily":  false,
-		"failTendencyAlarmDaily":      false,
-		"failTargetCosPhiAlarmWeekly": false,
-		"failTendencyAlarmWeekly":     false,
+		"cosPhiDaily":      0,
+		"cosPhiDailyType":  "",
+		"cosPhiWeekly":     0,
+		"cosPhiWeeklyType": "",
+		"target":           false,
+		"tendency":         false,
 	}
 
 	// Send Alarms telemetry.
@@ -206,12 +203,12 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.Th
 		return status, alarms[0].(map[string]interface{}), errors.NewErrFound("Error call getMaintenanceAlarms %s", msg)
 	}
 
-	status, timeSeries, target, err := getTimeSeriesAndAttributes(deviceID[:len(deviceID)-3], token, msg, tb)
+	status, timeSeries, err := getTimeSeriesAndAttributes(deviceID[:len(deviceID)-3], token, msg, tb)
 	if err != nil {
 		return status, timeSeries, errors.WrapErrFound(err, err.Error())
 	}
 
-	return status, createAlarms(lastCommunication, timeSeries, alarms, target), nil
+	return status, createAlarms(lastCommunication, timeSeries, alarms), nil
 }
 
 // getLastCommunication: gets last communication of device.
@@ -262,34 +259,21 @@ func getMaintenanceAlarms(deviceID, token, msg string,
 
 // getTimeSeriesAndAttributes gets device timeSeries and target cos phi.
 func getTimeSeriesAndAttributes(deviceID, token, msg string,
-	tb controller.ThingsBoardController) (int, map[string]interface{}, float64, error) {
-	keys := map[string]interface{}{
-		"keys": "cosPhiDaily,cosPhiDailyType,failTargetCosPhiAlarmDaily,failTargetCosPhiAlarmWeekly," +
-			"failTendencyAlarmDaily,failTendencyAlarmWeekly",
-	}
+	tb controller.ThingsBoardController) (int, map[string]interface{}, error) {
+	keys := map[string]interface{}{"keys": "target,tendency"}
 
 	status, timeSeries, err := tb.Telemetry.GetLatestTimeseries("DEVICE", deviceID, token, keys)
 	if err != nil {
-		return status, timeSeries, 0, errors.WrapErrFound(err, msg)
+		return status, timeSeries, errors.WrapErrFound(err, msg)
 	}
 
-	status, credentials, err := tb.Device.GetDeviceCredentialsByDeviceID(deviceID, token)
-	if err != nil {
-		return status, credentials, 0, errors.WrapErrFound(err, msg)
-	}
-
-	status, attr, err := tb.DeviceAPI.GetDeviceAttributes(credentials["credentialsId"].(string), nil)
-	if err != nil {
-		return status, attr, 0, errors.WrapErrFound(err, msg)
-	}
-
-	return status, timeSeries, attr["client"].(map[string]interface{})["targetCosPhi"].(float64), nil
+	return status, timeSeries, nil
 }
 
 //nolint:funlen
 // createAlarms generates alarm object from device.
 func createAlarms(lastCommunication, timeSeries map[string]interface{},
-	maintenance []interface{}, target float64) map[string]interface{} {
+	maintenance []interface{}) map[string]interface{} {
 	var (
 		maintenanceStep      bool
 		maintenanceExcessive bool
@@ -306,21 +290,12 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 				"step":        false,
 				"excessive":   false,
 			},
-			"cosphi": map[string]interface{}{
-				"target": map[string]interface{}{
-					"current": false,
-					"daily":   false,
-					"weekly":  false,
-				},
-				"tendency": map[string]interface{}{
-					"daily":  false,
-					"weekly": false,
-				},
+			"cosPhi": map[string]interface{}{
+				"target":   false,
+				"tendency": false,
 			},
 		}
 	}
-
-	current := false
 
 	for _, step := range maintenance[0].(map[string]interface{})["POWLOSS_STEPS"].(map[string]interface{}) {
 		if step == true {
@@ -338,25 +313,11 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 		}
 	}
 
-	cosPhiDailyType := timeSeries["cosPhiDailyType"].([]interface{})[0].(map[string]interface{})["value"].(string)
-	cosPhiDailyStr := timeSeries["cosPhiDaily"].([]interface{})[0].(map[string]interface{})["value"].(string)
-	cosPhiDaily, _ := strconv.ParseFloat(cosPhiDailyStr, 8)
+	target := shared.StrToBool(
+		timeSeries["tendency"].([]interface{})[0].(map[string]interface{})["value"].(string))
 
-	if (cosPhiDaily < target) && cosPhiDailyType == "L" {
-		current = true
-	}
-
-	failTargetCosPhiAlarmDaily := shared.StrToBool(
-		timeSeries["failTargetCosPhiAlarmDaily"].([]interface{})[0].(map[string]interface{})["value"].(string))
-
-	failTargetCosPhiAlarmWeekly := shared.StrToBool(
-		timeSeries["failTargetCosPhiAlarmWeekly"].([]interface{})[0].(map[string]interface{})["value"].(string))
-
-	failTendencyAlarmDaily := shared.StrToBool(
-		timeSeries["failTendencyAlarmDaily"].([]interface{})[0].(map[string]interface{})["value"].(string))
-
-	failTendencyAlarmWeekly := shared.StrToBool(
-		timeSeries["failTendencyAlarmWeekly"].([]interface{})[0].(map[string]interface{})["value"].(string))
+	tendency := shared.StrToBool(
+		timeSeries["tendency"].([]interface{})[0].(map[string]interface{})["value"].(string))
 
 	return map[string]interface{}{
 		"communication": map[string]interface{}{
@@ -368,16 +329,9 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 			"step":        maintenanceStep,
 			"excessive":   maintenanceExcessive,
 		},
-		"cosphi": map[string]interface{}{
-			"target": map[string]interface{}{
-				"current": current,
-				"daily":   failTargetCosPhiAlarmDaily,
-				"weekly":  failTargetCosPhiAlarmWeekly,
-			},
-			"tendency": map[string]interface{}{
-				"daily":  failTendencyAlarmDaily,
-				"weekly": failTendencyAlarmWeekly,
-			},
+		"cosPhi": map[string]interface{}{
+			"target":   target,
+			"tendency": tendency,
 		},
 	}
 }
