@@ -146,35 +146,27 @@ func getAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]
 	switch deviceType {
 	case computerC6:
 		powrloss := map[string]interface{}{
-			"POWLOSS_STEP01": false, "POWLOSS_STEP02": false,
-			"POWLOSS_STEP03": false, "POWLOSS_STEP04": false,
+			"POWLOSS_STEP01": false, "POWLOSS_STEP02": false, "POWLOSS_STEP03": false, "POWLOSS_STEP04": false,
 			"POWLOSS_STEP05": false, "POWLOSS_STEP06": false,
 		}
 
 		repconn := map[string]interface{}{
-			"REPCONN_STEP01": false, "REPCONN_STEP02": false,
-			"REPCONN_STEP03": false, "REPCONN_STEP04": false,
+			"REPCONN_STEP01": false, "REPCONN_STEP02": false, "REPCONN_STEP03": false, "REPCONN_STEP04": false,
 			"REPCONN_STEP05": false, "REPCONN_STEP06": false,
 		}
 
 		return powrloss, repconn
 	case computerC12:
 		powrloss := map[string]interface{}{
-			"POWLOSS_STEP01": false, "POWLOSS_STEP02": false,
-			"POWLOSS_STEP03": false, "POWLOSS_STEP04": false,
-			"POWLOSS_STEP05": false, "POWLOSS_STEP06": false,
-			"POWLOSS_STEP07": false, "POWLOSS_STEP08": false,
-			"POWLOSS_STEP09": false, "POWLOSS_STEP10": false,
-			"POWLOSS_STEP11": false, "POWLOSS_STEP12": false,
+			"POWLOSS_STEP01": false, "POWLOSS_STEP02": false, "POWLOSS_STEP03": false, "POWLOSS_STEP04": false,
+			"POWLOSS_STEP05": false, "POWLOSS_STEP06": false, "POWLOSS_STEP07": false, "POWLOSS_STEP08": false,
+			"POWLOSS_STEP09": false, "POWLOSS_STEP10": false, "POWLOSS_STEP11": false, "POWLOSS_STEP12": false,
 		}
 
 		repconn := map[string]interface{}{
-			"REPCONN_STEP01": false, "REPCONN_STEP02": false,
-			"REPCONN_STEP03": false, "REPCONN_STEP04": false,
-			"REPCONN_STEP05": false, "REPCONN_STEP06": false,
-			"REPCONN_STEP07": false, "REPCONN_STEP08": false,
-			"REPCONN_STEP09": false, "REPCONN_STEP10": false,
-			"REPCONN_STEP11": false, "REPCONN_STEP12": false,
+			"REPCONN_STEP01": false, "REPCONN_STEP02": false, "REPCONN_STEP03": false, "REPCONN_STEP04": false,
+			"REPCONN_STEP05": false, "REPCONN_STEP06": false, "REPCONN_STEP07": false, "REPCONN_STEP08": false,
+			"REPCONN_STEP09": false, "REPCONN_STEP10": false, "REPCONN_STEP11": false, "REPCONN_STEP12": false,
 		}
 
 		return powrloss, repconn
@@ -270,7 +262,6 @@ func getTimeSeriesAndAttributes(deviceID, token, msg string,
 	return status, timeSeries, nil
 }
 
-//nolint:funlen
 // createAlarms generates alarm object from device.
 func createAlarms(lastCommunication, timeSeries map[string]interface{},
 	maintenance []interface{}) map[string]interface{} {
@@ -282,17 +273,13 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 	if lastCommunication["date"] == "" {
 		return map[string]interface{}{
 			"communication": map[string]interface{}{
-				"communication": false,
-				"date":          "",
+				"communication": false, "date": "",
 			},
 			"maintenance": map[string]interface{}{
-				"maintenance": false,
-				"step":        false,
-				"excessive":   false,
+				"maintenance": false, "step": false, "excessive": false,
 			},
 			"cosPhi": map[string]interface{}{
-				"target":   false,
-				"tendency": false,
+				"target": false, "tendency": false,
 			},
 		}
 	}
@@ -314,15 +301,14 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 	}
 
 	target := shared.StrToBool(
-		timeSeries["tendency"].([]interface{})[0].(map[string]interface{})["value"].(string))
+		timeSeries["target"].([]interface{})[0].(map[string]interface{})["value"].(string))
 
 	tendency := shared.StrToBool(
 		timeSeries["tendency"].([]interface{})[0].(map[string]interface{})["value"].(string))
 
 	return map[string]interface{}{
 		"communication": map[string]interface{}{
-			"communication": lastCommunication["status"],
-			"date":          lastCommunication["date"],
+			"communication": lastCommunication["status"], "date": lastCommunication["date"],
 		},
 		"maintenance": map[string]interface{}{
 			"maintenance": maintenance[0].(map[string]interface{})["OPERATING_HOURS"].(map[string]interface{})["status"],
@@ -330,8 +316,7 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 			"excessive":   maintenanceExcessive,
 		},
 		"cosPhi": map[string]interface{}{
-			"target":   target,
-			"tendency": tendency,
+			"target": target, "tendency": tendency,
 		},
 	}
 }
