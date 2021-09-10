@@ -113,7 +113,7 @@ func (c ComputerC) UpdateTypology(deviceID, token, msg string, tb controller.Thi
 // TelemetryInitialization initialization default values.
 func (c ComputerC) TelemetryInitialization(accessToken, deviceType, msg string,
 	tb controller.ThingsBoardController) (int, map[string]interface{}, error) {
-	powloss, repconn := getAlarmsDeviceType(deviceType)
+	powloss, repconn := GetAlarmsDeviceType(deviceType)
 
 	query := map[string]interface{}{
 		"maintenance": map[string]interface{}{
@@ -141,8 +141,8 @@ func (c ComputerC) TelemetryInitialization(accessToken, deviceType, msg string,
 	return status, nil, nil
 }
 
-// getAlarmsDeviceType get types alarms from devices type.
-func getAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]interface{}) {
+// GetAlarmsDeviceType get types alarms from devices type.
+func GetAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]interface{}) {
 	switch deviceType {
 	case computerC6:
 		powrloss := map[string]interface{}{
