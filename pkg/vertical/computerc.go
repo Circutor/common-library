@@ -262,14 +262,16 @@ func getTimeSeriesAndAttributes(deviceID, token, msg string,
 	return status, timeSeries, nil
 }
 
+// nolint:funlen
 // createAlarms generates alarm object from device.
 func createAlarms(lastCommunication, timeSeries map[string]interface{},
 	maintenance []interface{}) map[string]interface{} {
 	var (
 		maintenanceStep      bool
 		maintenanceExcessive bool
+		maintenanceDate      bool
 	)
-
+	// Case when device has never been connected.
 	if lastCommunication["date"] == "" {
 		return map[string]interface{}{
 			"communication": map[string]interface{}{
@@ -284,20 +286,25 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 		}
 	}
 
-	for _, step := range maintenance[0].(map[string]interface{})["POWLOSS_STEPS"].(map[string]interface{}) {
-		if step == true {
-			maintenanceStep = true
+	// Case when there is not maintenance.
+	if len(maintenance) > 0 {
+		for _, step := range maintenance[0].(map[string]interface{})["POWLOSS_STEPS"].(map[string]interface{}) {
+			if step == true {
+				maintenanceStep = true
 
-			break
+				break
+			}
 		}
-	}
 
-	for _, excessive := range maintenance[0].(map[string]interface{})["REPCONN_STEPS"].(map[string]interface{}) {
-		if excessive == true {
-			maintenanceExcessive = true
+		for _, excessive := range maintenance[0].(map[string]interface{})["REPCONN_STEPS"].(map[string]interface{}) {
+			if excessive == true {
+				maintenanceExcessive = true
 
-			break
+				break
+			}
 		}
+
+		maintenanceDate = maintenance[0].(map[string]interface{})["OPERATING_HOURS"].(map[string]interface{})["status"].(bool)
 	}
 
 	target := shared.StrToBool(
@@ -311,7 +318,7 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 			"communication": lastCommunication["status"], "date": lastCommunication["date"],
 		},
 		"maintenance": map[string]interface{}{
-			"maintenance": maintenance[0].(map[string]interface{})["OPERATING_HOURS"].(map[string]interface{})["status"],
+			"maintenance": maintenanceDate,
 			"step":        maintenanceStep,
 			"excessive":   maintenanceExcessive,
 		},
