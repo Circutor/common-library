@@ -206,7 +206,7 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg, computerServiceURI stri
 // getLastCommunication: gets last communication of device.
 func getLastCommunication(deviceID, token, msg, computerServiceURI string,
 	d data.InterfaceData, r request.InterfaceRequest) (int, map[string]interface{}, error) {
-	urlLastCommunication := computerServiceURI + ":60020/api/v1/computer-service/lastCommunication"
+	urlLastCommunication := computerServiceURI + "/api/v1/computer-service/lastCommunication"
 
 	resBody, status, err := r.CreateNewRequest(
 		http.MethodGet, urlLastCommunication, token, nil, map[string]interface{}{"deviceId": deviceID})
@@ -229,7 +229,7 @@ func getLastCommunication(deviceID, token, msg, computerServiceURI string,
 // getMaintenanceAlarms gets last alarms maintenance of device.
 func getMaintenanceAlarms(deviceID, token, msg, computerServiceURI string,
 	d data.InterfaceData, r request.InterfaceRequest) (int, []interface{}, error) {
-	urlGetAlarms := computerServiceURI + ":60020/api/v1/computer-service/maintenance"
+	urlGetAlarms := computerServiceURI + "/api/v1/computer-service/maintenance"
 
 	resBody, status, err := r.CreateNewRequest(
 		http.MethodGet, urlGetAlarms, token, nil, map[string]interface{}{"deviceId": deviceID, "numberOfDays": 1})
