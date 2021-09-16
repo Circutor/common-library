@@ -32,7 +32,7 @@ type InterfaceVertical interface {
 		data data.InterfaceData) (int, map[string]interface{}, error)
 	TelemetryInitialization(accessToken, deviceType, msg string,
 		tb controller.ThingsBoardController) (int, map[string]interface{}, error)
-	GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
+	GetDeviceAlarms(deviceID, token, msg, computerServiceURI string, tb controller.ThingsBoardController,
 		data data.InterfaceData, request request.InterfaceRequest) (int, map[string]interface{}, error)
 }
 

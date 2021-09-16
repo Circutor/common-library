@@ -175,9 +175,9 @@ func GetAlarmsDeviceType(deviceType string) (map[string]interface{}, map[string]
 	return nil, nil
 }
 
-func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.ThingsBoardController,
+func (c ComputerC) GetDeviceAlarms(deviceID, token, msg, computerServiceURI string, tb controller.ThingsBoardController,
 	data data.InterfaceData, request request.InterfaceRequest) (int, map[string]interface{}, error) {
-	status, lastCommunication, err := getLastCommunication(deviceID, token, msg, data, request)
+	status, lastCommunication, err := getLastCommunication(deviceID, token, msg, computerServiceURI, data, request)
 	if err != nil {
 		return status, lastCommunication, errors.WrapErrFound(err, err.Error())
 	}
@@ -186,7 +186,7 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.Th
 		return status, lastCommunication, errors.NewErrFound("Error call getLastCommunication %s", msg)
 	}
 
-	status, alarms, err := getMaintenanceAlarms(deviceID, token, msg, data, request)
+	status, alarms, err := getMaintenanceAlarms(deviceID, token, msg, computerServiceURI, data, request)
 	if err != nil {
 		return status, alarms[0].(map[string]interface{}), errors.WrapErrFound(err, err.Error())
 	}
@@ -204,9 +204,9 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg string, tb controller.Th
 }
 
 // getLastCommunication: gets last communication of device.
-func getLastCommunication(deviceID, token, msg string,
+func getLastCommunication(deviceID, token, msg, computerServiceURI string,
 	d data.InterfaceData, r request.InterfaceRequest) (int, map[string]interface{}, error) {
-	urlLastCommunication := "http://computer-telemetry-service:60020/api/v1/computer-service/lastCommunication"
+	urlLastCommunication := computerServiceURI + ":60020/api/v1/computer-service/lastCommunication"
 
 	resBody, status, err := r.CreateNewRequest(
 		http.MethodGet, urlLastCommunication, token, nil, map[string]interface{}{"deviceId": deviceID})
@@ -227,9 +227,9 @@ func getLastCommunication(deviceID, token, msg string,
 }
 
 // getMaintenanceAlarms gets last alarms maintenance of device.
-func getMaintenanceAlarms(deviceID, token, msg string,
+func getMaintenanceAlarms(deviceID, token, msg, computerServiceURI string,
 	d data.InterfaceData, r request.InterfaceRequest) (int, []interface{}, error) {
-	urlGetAlarms := "http://computer-telemetry-service:60020/api/v1/computer-service/maintenance"
+	urlGetAlarms := computerServiceURI + ":60020/api/v1/computer-service/maintenance"
 
 	resBody, status, err := r.CreateNewRequest(
 		http.MethodGet, urlGetAlarms, token, nil, map[string]interface{}{"deviceId": deviceID, "numberOfDays": 1})

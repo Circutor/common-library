@@ -16,20 +16,20 @@ type InterfaceVerticalMock struct {
 	mock.Mock
 }
 
-// GetDeviceAlarms provides a mock function with given fields: deviceID, token, msg, tb, _a4, _a5
-func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, msg string, tb controller.ThingsBoardController, _a4 data.InterfaceData, _a5 request.InterfaceRequest) (int, map[string]interface{}, error) {
-	ret := _m.Called(deviceID, token, msg, tb, _a4, _a5)
+// GetDeviceAlarms provides a mock function with given fields: deviceID, token, msg, computerServiceURI, tb, _a5, _a6
+func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, msg string, computerServiceURI string, tb controller.ThingsBoardController, _a5 data.InterfaceData, _a6 request.InterfaceRequest) (int, map[string]interface{}, error) {
+	ret := _m.Called(deviceID, token, msg, computerServiceURI, tb, _a5, _a6)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) int); ok {
-		r0 = rf(deviceID, token, msg, tb, _a4, _a5)
+	if rf, ok := ret.Get(0).(func(string, string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) int); ok {
+		r0 = rf(deviceID, token, msg, computerServiceURI, tb, _a5, _a6)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 map[string]interface{}
-	if rf, ok := ret.Get(1).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) map[string]interface{}); ok {
-		r1 = rf(deviceID, token, msg, tb, _a4, _a5)
+	if rf, ok := ret.Get(1).(func(string, string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) map[string]interface{}); ok {
+		r1 = rf(deviceID, token, msg, computerServiceURI, tb, _a5, _a6)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(map[string]interface{})
@@ -37,8 +37,8 @@ func (_m *InterfaceVerticalMock) GetDeviceAlarms(deviceID string, token string, 
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) error); ok {
-		r2 = rf(deviceID, token, msg, tb, _a4, _a5)
+	if rf, ok := ret.Get(2).(func(string, string, string, string, controller.ThingsBoardController, data.InterfaceData, request.InterfaceRequest) error); ok {
+		r2 = rf(deviceID, token, msg, computerServiceURI, tb, _a5, _a6)
 	} else {
 		r2 = ret.Error(2)
 	}
