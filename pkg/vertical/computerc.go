@@ -61,7 +61,6 @@ func (c ComputerC) SetAttrServer(deviceID, costumerID, secretKey, token, msg str
 		"claimingAllowed": true,
 		"claimingData":    map[string]interface{}{"secretKey": secretKey, "expirationTime": expirationTime},
 		"userMaster":      costumerID,
-		"subscriber":      map[string]interface{}{},
 	}
 
 	status, saveAttributes, err := tb.Telemetry.SaveDeviceAttributes(deviceID, "SERVER_SCOPE", token, attrBody)
