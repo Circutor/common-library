@@ -20,7 +20,7 @@ type InterfaceTransversal interface {
 //nolint:lll
 //go:generate mockery --name InterfaceTransversal --structname InterfaceTransversalMock --filename InterfaceTransversalMock.go
 
-// Transversal transversal attributes to send to ThingsBoard.
+// Transversal attributes to send to ThingsBoard.
 type Transversal struct {
 	Name        string `json:"name" validate:"required,max=32"`
 	Description string `json:"description" validate:"required,max=64"`

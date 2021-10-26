@@ -274,7 +274,7 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 	if lastCommunication["date"] == "" {
 		return map[string]interface{}{
 			"communication": map[string]interface{}{
-				"isCommunicating": true, "date": "",
+				"isDisconnected": true, "date": "",
 			},
 			"maintenance": map[string]interface{}{
 				"annualMaintenance": false, "step": false, "excessive": false,
@@ -314,7 +314,7 @@ func createAlarms(lastCommunication, timeSeries map[string]interface{},
 
 	return map[string]interface{}{
 		"communication": map[string]interface{}{
-			"isCommunicating": lastCommunication["status"], "date": lastCommunication["date"],
+			"isDisconnected": lastCommunication["status"], "date": lastCommunication["date"],
 		},
 		"maintenance": map[string]interface{}{
 			"annualMaintenance": maintenanceDate,

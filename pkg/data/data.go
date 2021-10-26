@@ -11,6 +11,8 @@ const (
 	// Constants error.
 	errEncodeRequestBody  = "error in encode request body"
 	errDecodeResponseBody = "error in decode response body"
+	errDeviceIDEncode     = "error in deviceID Encode"
+	errDeviceIDDecode     = "error in deviceID Decode"
 	// Constants to use with the content type.
 	contentType     = "Content-type"
 	contentTypeJSON = "application/json"
@@ -22,6 +24,8 @@ type InterfaceData interface {
 	BodyDecodeToArray(contentBody []byte) ([]interface{}, error)
 	ResponseDecodeToMap(v interface{}) (map[string]interface{}, error)
 	ResponseDecodeToArray(v interface{}) ([]interface{}, error)
+	DeviceIDEncode(deviceID string) (string, error)
+	DeviceIDDecode(uuid string) (string, error)
 	SendJSON(w http.ResponseWriter, v interface{})
 }
 

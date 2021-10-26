@@ -84,6 +84,48 @@ func (_m *InterfaceDataMock) BodyEncode(v interface{}) (*bytes.Buffer, error) {
 	return r0, r1
 }
 
+// DeviceIDDecode provides a mock function with given fields: uuid
+func (_m *InterfaceDataMock) DeviceIDDecode(uuid string) (string, error) {
+	ret := _m.Called(uuid)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DeviceIDEncode provides a mock function with given fields: deviceID
+func (_m *InterfaceDataMock) DeviceIDEncode(deviceID string) (string, error) {
+	ret := _m.Called(deviceID)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(deviceID)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(deviceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ResponseDecodeToArray provides a mock function with given fields: v
 func (_m *InterfaceDataMock) ResponseDecodeToArray(v interface{}) ([]interface{}, error) {
 	ret := _m.Called(v)
