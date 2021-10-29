@@ -194,7 +194,7 @@ func (c ComputerC) GetDeviceAlarms(deviceID, token, msg, computerServiceURI stri
 		return status, alarms[0].(map[string]interface{}), errors.NewErrFound("Error call getMaintenanceAlarms %s", msg)
 	}
 
-	status, timeSeries, err := getTimeSeriesAndAttributes(deviceID[:len(deviceID)-3], token, msg, tb)
+	status, timeSeries, err := getTimeSeriesAndAttributes(deviceID, token, msg, tb)
 	if err != nil {
 		return status, timeSeries, errors.WrapErrFound(err, err.Error())
 	}
