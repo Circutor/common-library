@@ -55,12 +55,13 @@ func (c ComputerC) IsValid() ([]string, error) {
 }
 
 // SetAttrServer add in server scope attributes from attributes from to claiming device.
-func (c ComputerC) SetAttrServer(deviceID, costumerID, secretKey, token, msg string, expirationTime int,
+func (c ComputerC) SetAttrServer(deviceID, costumerID, serialID, secretKey, token, msg string, expirationTime int,
 	tb controller.ThingsBoardController, data data.InterfaceData) (int, map[string]interface{}, error) {
 	attrBody := map[string]interface{}{
 		"claimingAllowed": true,
 		"claimingData":    map[string]interface{}{"secretKey": secretKey, "expirationTime": expirationTime},
 		"userMaster":      costumerID,
+		"serialId":        serialID,
 	}
 
 	status, saveAttributes, err := tb.Telemetry.SaveDeviceAttributes(deviceID, "SERVER_SCOPE", token, attrBody)

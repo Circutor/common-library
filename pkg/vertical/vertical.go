@@ -24,7 +24,7 @@ func CreateCRC8(deviceID string) string {
 
 // InterfaceVertical Operations device vertical.
 type InterfaceVertical interface {
-	SetAttrServer(deviceID, costumerID, secretKey, token, msg string, expirationTime int,
+	SetAttrServer(deviceID, costumerID, serialID, secretKey, token, msg string, expirationTime int,
 		tb controller.ThingsBoardController, data data.InterfaceData) (int, map[string]interface{}, error)
 	SetAttrClient(accessToken, msg string, tb controller.ThingsBoardController,
 		data data.InterfaceData) (int, map[string]interface{}, error)
