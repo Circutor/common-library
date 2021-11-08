@@ -23,9 +23,18 @@ func TestErrorDeviceIdDecode(t *testing.T) {
 func TestSuccessErrorDeviceIdDecode(t *testing.T) {
 	t.Parallel()
 
-	d := data.NewData()
+	// nolint: paralleltest
+	for _, tc := range testUUIDCode {
+		tc := tc
 
-	uuid, _ := d.DeviceIDDecode("Kp5JHdH8q3LVrXqutMo2G5")
-	assert.Equal(t, 36, len(uuid))
-	assert.Equal(t, "123e4567-e89b-12d3-a456-426655440000", uuid)
+		t.Run("Test success Decode", func(t *testing.T) {
+			t.Parallel()
+
+			d := data.NewData()
+
+			uuid, _ := d.DeviceIDDecode(tc.shortUUID)
+			assert.Equal(t, 36, len(uuid))
+			assert.Equal(t, tc.uuid, uuid)
+		})
+	}
 }

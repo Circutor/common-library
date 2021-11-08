@@ -16,5 +16,11 @@ func (d *Data) DeviceIDEncode(deviceID string) (string, error) {
 		return "", fmt.Errorf("%s : %w", errDeviceIDEncode, err)
 	}
 
-	return shortuuid.DefaultEncoder.Encode(uuidParse), nil
+	shortID := shortuuid.DefaultEncoder.Encode(uuidParse)
+
+	for len(shortID) < 22 {
+		shortID += "2"
+	}
+
+	return shortID, nil
 }
