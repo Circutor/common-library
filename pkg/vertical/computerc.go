@@ -23,7 +23,7 @@ const (
 
 // ComputerC vertical attributes device type ComputerC (ComputerC6 && ComputerC12).
 type ComputerC struct {
-	TargetCosPhi     float32 `json:"targetCosPhi" validate:"omitempty,gte=0.89,lte=0.99"`
+	TargetCosPhi     float32 `json:"targetCosPhi" validate:"omitempty,gte=0.89,lte=1.00"`
 	Power            float32 `json:"power" validate:"omitempty,gte=0,lte=9999.9"`
 	Voltage          float32 `json:"voltage" validate:"omitempty,gte=180,lte=999"`
 	RejectionFilters bool    `json:"rejectionFilters" default:"true" validate:"omitempty"`
