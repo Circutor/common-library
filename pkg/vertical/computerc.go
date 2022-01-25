@@ -27,16 +27,18 @@ type ComputerC struct {
 	Power            float32 `json:"power" validate:"omitempty,gte=0,lte=9999.9"`
 	Voltage          float32 `json:"voltage" validate:"omitempty,gte=180,lte=999"`
 	RejectionFilters bool    `json:"rejectionFilters" default:"true" validate:"omitempty"`
+	CapacitorBankID  string  `json:"capacitorBankId" default:"" validate:"omitempty"`
 }
 
 // NewComputerC created a struct ComputerC implement InterfaceVertical.
 func NewComputerC(targetCosPhi, power, voltage float32,
-	rejectionFilter bool) ComputerC {
+	rejectionFilter bool, capacitorBankID string) ComputerC {
 	return ComputerC{
 		TargetCosPhi:     targetCosPhi,
 		Power:            power,
 		Voltage:          voltage,
 		RejectionFilters: rejectionFilter,
+		CapacitorBankID:  capacitorBankID,
 	}
 }
 
@@ -78,7 +80,7 @@ func (c ComputerC) SetAttrServer(deviceID, costumerID, serialID, secretKey, toke
 func (c ComputerC) SetAttrClient(accessToken, msg string, tb controller.ThingsBoardController,
 	data data.InterfaceData) (int, map[string]interface{}, error) {
 	attrBody, err := data.ResponseDecodeToMap(
-		NewComputerC(c.TargetCosPhi, c.Power, c.Voltage, c.RejectionFilters))
+		NewComputerC(c.TargetCosPhi, c.Power, c.Voltage, c.RejectionFilters, c.CapacitorBankID))
 	if err != nil {
 		dataError, _ := data.ResponseDecodeToMap(errors.NewErrMessage(err.Error()))
 
